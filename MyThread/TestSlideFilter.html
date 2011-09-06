@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ToDO:
+1. Support using dojox.storage to serialize tasks into local browser
+2.
+-->
+<html dir="ltr">
+    <head>
+        <style type="text/css">
+            body, html {
+                font-family: helvetica, arial, sans-serif;
+                font-size: 90%;
+            }
+        </style>
+        <script type="text/javascript" src="./dojo/dojo/dojo.js" djConfig="parseOnLoad: true">
+        </script>
+        <link rel="stylesheet" type="text/css" href="./dojo/dijit/themes/claro/claro.css" />
+        <script type="text/javascript">
+            dojo.require("dojo.data.ItemFileReadStore");
+            dojo.require("dijit.form.Button");
+            dojo.require("dijit.form.Select");
+            dojo.require("dojo.fx");
+            var rowWidth = 3;
+            var iconWidth = 200;
+            var iconHeight = 200;
+            var topBase = 200;
+            var leftBase = 200;
+            var storeData = {
+                identifier: 'name',
+                items: [{
+                    idd: "item1",
+                    name: "activity",
+                    image: "images/activity-monitor.png",
+                    size: 100,
+                    type: "app",
+                }, {
+                    idd: "item2",
+                    name: "front",
+                    image: "images/front-row.png",
+                    size: 200,
+                    type: "app",
+                }, {
+                    idd: "item3",
+                    name: "ical",
+                    image: "images/ical.png",
+                    size: 300,
+                    type: "app",
+                }, {
+                    idd: "item4",
+                    name: "interface",
+                    image: "images/interface-builder.png",
+                    size: 400,
+                    type: "app",
+                }, {
+                    idd: "item5",
+                    name: "textedit",
+                    image: "images/textedit.png",
+                    size: 500,
+                    type: "app",
+                }]
+            }
+            //Callback for if the lookup fails.
+            function fetchFailed(error, request){
+                alert("lookup failed.");
+            }
+            
+            function clearSortedList(size, request){
+                return;
+            }
+            
+            function calcNewPositions(items){
+                // 5 items a row
+                var animations = [];
+                
+                for (var i = 0; i < items.length; i++) {
+                    currentRow = Math.round(i / rowWidth - 0.5);
+                    currentColumn = i % rowWidth;
+                    items[i].top = currentRow * iconHeight + topBase;
+                    items[i].left = currentColumn * iconWidth + leftBase;
+                    items[i].anim = dojo.fx.slideTo({
+                        node: items[i].idd[0],
+                        top: items[i].top,
+                        left: items[i].left
+                    })
+                    animations[i] = items[i].anim;
+                    
+                }
+                console.log("play the slide")
+                dojo.fx.combine(animations).play();
+            }
+            
+            function playAnimation(items, request){
+            
+                calcNewPositions(items);
+                printItems(items);
+                
+            }
+            
+            function printItems(items){
+                for (var i = 0; i < items.length; i++) 
+                    console.log("name:" + items[i].name + ",size:" + items[i].size + ",top:" + items[i].top + ",left:" + items[i].left);
+            }
+            
+            /**
+             *
+             */
+            function sortItems(sortBy, isDescending){
+                console.log("sortItems:" + "sortBy:" + sortBy + ", descending:" + isDescending);
+                
+                // sort
+                //Fetch the data in a sorted order.
+                
+                var sortKeys = [{
+                    attribute: sortBy,
+                    descending: isDescending,
+                }];
+                appStore.fetch({
+                    onBegin: clearSortedList,
+                    onComplete: playAnimation,
+                    onError: fetchFailed,
+                    sort: sortKeys,
+                });
+                //calc the new position
+            
+                //combine the animation 
+            }
+            
+            /**
+             *  Sort by the attribute of the item
+             * @param {Object} items
+             * @param {Object} attr
+             * @return a sorted array
+             */
+            function sortString(items, attr){
+            
+                return results;
+            }
+            
+            function setImage(items, request){
+                console.log("enter setImage");
+                for (var i = 0; i < items.length; i++) {
+                    console.log("feched item:" + items[i].idd + ", image:" + items[i].image)
+                    var img = dojo.byId(items[i].idd[0]);
+                    img.src = items[i].image[0];
+                    
+                }
+                calcNewPositions(items);
+            }
+            
+            function initImages(){
+                appStore.fetch({
+                    onBegin: clearSortedList,
+                    onComplete: setImage,
+                    onError: fetchFailed,
+                });
+            }
+            
+            dojo.addOnLoad(function(){
+            
+                //sortItems("size", false);
+                initImages();
+                dojo.connect(button, "onChange", function(){
+                    sortItem(sortBy.value, isDescending.value);
+                });
+                
+            });
+        </script>
+        <body class="claro">
+            <div dojoType="dojo.data.ItemFileReadStore" data="storeData" jsId="appStore">
+            </div>
+            <select name="sortBy" dojoType="dijit.form.Select" jsId="sortBy">
+                <option value="name">Name</option>
+                <option value="size" selected="selected">Size</option>
+                <option value="age">Age</option>
+            </select>
+            <img id="item1"/><img id="item2"/><img id="item3"/><img id="item4"/><img id="item5"/>
+        </body>
+        <html>
+        </html>
