@@ -86,7 +86,7 @@
             }
             
             function playAnimation(items, request){
-            
+                 
                 calcNewPositions(items);
                 printItems(items);
                 
@@ -98,38 +98,23 @@
             }
             
             /**
-             *
+             * 
              */
             function sortItems(sortBy, isDescending){
-                console.log("sortItems:" + "sortBy:" + sortBy + ", descending:" + isDescending);
-                
-                // sort
-                //Fetch the data in a sorted order.
-                
+                console.log("sortItems:" + "sortBy:" + sortBy + ", descending:" + isDescending);                
+                //Fetch the data items in a sorted order.                
                 var sortKeys = [{
                     attribute: sortBy,
                     descending: isDescending,
                 }];
                 appStore.fetch({
                     onBegin: clearSortedList,
+					//calc new position and play the animation
                     onComplete: playAnimation,
                     onError: fetchFailed,
                     sort: sortKeys,
-                });
-                //calc the new position
-            
-                //combine the animation 
-            }
-            
-            /**
-             *  Sort by the attribute of the item
-             * @param {Object} items
-             * @param {Object} attr
-             * @return a sorted array
-             */
-            function sortString(items, attr){
-            
-                return results;
+                });     
+                
             }
             
             function setImage(items, request){
@@ -151,25 +136,14 @@
                 });
             }
             
-            dojo.addOnLoad(function(){
-        		    var isDescendingBtn = new dijit.form.ToggleButton({
-						
-                    showLabel: true,
-                    checked: false,
-					label: "isDescending",
-                    onChange: function(val) {
-                       // this.attr('label', val)
-                    },
-                  iconClass:"dijitCheckBoxIcon",
-                },
-                "isDescending");
+            dojo.addOnLoad(function(){    
         
                 initImages();
                 dojo.connect(sortBy, "onChange", function(){
-                    sortItems(sortBy.value, dijit.byId("isDescending").checked);
+                    sortItems(sortBy.value, isDescending.checked);
                 });
-                dojo.connect(dijit.byId("isDescending"), "onChange", function(){
-                    sortItems(sortBy.value, dijit.byId("isDescending").checked);
+                dojo.connect(isDescending, "onChange", function(){
+                    sortItems(sortBy.value, isDescending.checked);
                 });
             });
         </script>
@@ -181,7 +155,7 @@
                 <option value="size" selected="selected">Size</option>
                 <option value="age">Age</option>
             </select>
-			<button id="isDescending">is Descending?</button>
+			<button dojoType="dijit.form.ToggleButton" jsId="isDescending" iconClass="dijitCheckBoxIcon">is Descending?</button>
             <img id="item1"/><img id="item2"/><img id="item3"/><img id="item4"/><img id="item5"/>
         </body>
         <html>

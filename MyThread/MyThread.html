@@ -1,0 +1,528 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ToDO:
+1. Support using dojox.storage to serialize tasks into local browser
+2.
+-->
+<html dir="ltr">
+<head>
+    <script type="text/javascript" src="./dojo/dojo/dojo.js" djConfig="parseOnLoad: true">
+                   <!-- <script src="http://o.aolcdn.com/dojo/1.6.0/dojo/dojo.xd.js" type="text/javascript"> -->
+                    
+            
+    </script>
+    <link rel="stylesheet" type="text/css" href="./lib/dojo150/dijit/themes/claro/claro.css" />
+    <style type="text/css">
+        body, html {
+            font-family: helvetica, arial, sans-serif;
+            font-size: 90%;
+        }
+        
+        .controlPanel {
+            top: 5px;
+            right: 150px;
+            position: fixed;
+            display: block;
+            border-left: thin solid #444444;
+            border-right: thin solid #444444;
+            padding: 2px 2px 2px 2px;
+            width: 150px;
+            height: 200px;
+        }
+        
+        .thread {
+            float: left;
+            width: 350px;
+            height: 600px;
+            border-right: thin solid #444444;
+            padding: 10px 5px 10px 5px;
+        }
+        
+        .taskOp {
+            color: #FFFFFF;
+            width: 10px;
+            display: inline-block;
+        }
+        
+        .taskOpHover {
+            color: red;
+            width: 10px;
+            display: inline-block;
+        }
+        
+        .taskContent {
+            display: inline-block;
+            border-bottom: thin solid #D9D9D9;
+            height: 50px;
+            width: 300px;
+            padding: 0px 2px 2px 4px
+        }
+        
+        .taskContentHover {
+            display: inline-block;
+            border-bottom: thin solid #444444;
+            height: 50px;
+            width: 300px;
+            padding: 0px 2px 2px 4px
+        }
+        
+        .taskContentSelected {
+            background: #EEEEEE;
+        }
+        
+        .threadTitle {
+            font-size: 12px;
+            font-color: #444444
+        }
+    </style>
+</head>
+<body class=" claro ">
+    <div id="layout" style="width: 1000px,boarder:thick">
+        <div class="thread" id="TheMainThread">
+            <p class="threadTitle">
+                Thread Title
+            </p>
+            <div class="task">
+                <div class="taskOp" onclick="deleteTask()">
+                    X
+                </div>
+                <div class="taskContent">
+                    Task1 a lot of contents in task description, 
+                    <br/>
+                    what about multi rows
+                </div>
+            </div>
+            <div class="task">
+                <div class="taskOp">
+                    X
+                </div>
+                <div class="taskContent">
+                    Task2
+                </div>
+            </div>
+        </div>
+        <div class="thread" id="thread2">
+        </div>
+        <div id="controlPanel" class="controlPanel">
+            <input type="text" id="newThreadTitle">
+            </input>
+            <button>
+                Create New Thread
+            </button>
+            <input type="text" id="newTaskDescription">
+            </input>
+            <button id="taskEditorCreateBtn">
+                Create New Task
+            </button>
+            <textarea id="taskDesc">
+            </textarea>
+            <button id="taskEditorUpdateBtn">
+                Update Task 
+            </button>
+            <textarea id="taskStringfiedEditor">
+            </textarea>
+            <button id="stringfyTaskBtn">
+                Stringfy Task
+            </button>
+            <button id="stringfyThreadBtn">
+                Stringfy Thread
+            </button>
+
+            <button id="saveTaskListBtn">
+                Save Task List
+            </button>
+        </div>
+        </div>
+    </body>
+</script>
+<script type="text/javascript">
+    dojo.require("dijit.form.ComboBox");
+    dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dojox.storage");
+</script>
+<script type="text/javascript">
+    function comboChanged(newValue){
+        alert(this.id + "changed:" + newValue);
+        
+    }
+    
+    dojo.addOnLoad(function(){
+        var stateStore = new dojo.data.ItemFileReadStore({
+            url: "../../_static/jsdijit/tests/_data/states.json"
+        });
+        var filteringSelect = new dijit.form.ComboBox({
+            id: "stateSelect",
+            name: "state",
+            value: "Kentucky",
+            store: stateStore,
+            searchAttr: "name",
+            onChange: comboChanged,
+        }, "stateSelect");
+    });
+</script>
+<!-- NOTE: the following script tag is not intended for usage in real
+world!! it is part of the CodeGlass and you should just remove it when
+you use the code -->
+<script type="text/javascript">
+    /**
+     * A task is an object in one thread.
+     * @param {Object} taskDesc
+     * @param {Object} id
+     * @param {Object} parentNode
+     */
+    var Task = function(taskDesc, id, parentNode){
+        /**
+         * Create a new task node and append it to parent Thread container Node
+         *
+         * desc, and id are only serializable fields
+         */
+        this.desc = taskDesc; //string
+        this.id = id; //string
+        this._taskEditor = null;
+        this.setTaskEditor = function(taskEditor){
+            this._taskEditor = taskEditor;
+        };
+        this.getTaskEditor = function(taskEditor){
+            return this._taskEditor;
+        };
+        /**
+         * Call _initialize after deserialize the task
+         *
+         * This method will create DomNodes and attach to parent Node.
+         */
+        this._initialize = function(){
+            /**
+             * these fields will not be serialized
+             */
+            this.domNode = dojo.create("div", {
+                id: id,
+                className: "task"
+            });
+            this.opNode = dojo.create("div", {
+                className: "taskOp"
+            }, this.domNode);
+            this.opNode.innerHTML = "X";
+            
+            this.contentNode = dojo.create("div", {
+                className: "taskContent"
+            }, this.domNode);
+            this.contentNode.innerHTML = id + ":" + taskDesc;
+            var opConnection = null;
+            
+            dojo.connect(this.domNode, "onmouseenter", dojo.hitch(this, function(){
+                console.log("hover on task");
+                dojo.addClass(this.contentNode, "taskContentHover");
+                dojo.addClass(this.opNode, "taskOpHover");
+                
+                activeTask = this;
+                console.log("activeTask:" + activeTask);
+                
+            }));
+            
+            
+            
+            /*connect onclick for selected task */
+            dojo.connect(this.contentNode, "onclick", dojo.hitch(this, function(evet){
+                console.log("task clicked:" + this.id);
+                if (selectedTask != null) 
+                    selectedTask.deSelect();
+                selectedTask = this;
+                this.select();
+                
+            }));
+            opConnectoin = dojo.connect(this.opNode, "onclick", dojo.hitch(this, function(event){
+                getActiveThread().deleteTask(this);
+                console.log("id:" + this.id + "task removed");
+                
+                
+            }));
+            /** connect onmouseleave to un-highlight task */
+            dojo.connect(this.domNode, "onmouseleave", dojo.hitch(this, function(){
+                console.log("hover ended on task");
+                
+                dojo.removeClass(this.contentNode, "taskContentHover");
+                dojo.removeClass(this.opNode, "taskOpHover");
+                
+            }));
+        }//end _initialize
+        /**
+         * Attache this task dom node to parent node
+         */
+        this.setDomNode = function(parentNode){
+            dojo.place(this.domNode, parentNode);
+        }
+        
+        this._initialize();
+        if (parentNode) {
+            this.setDomNode(parentNode);
+        }
+        /**
+         * Set the task into select status
+         */
+        this.select = function(){
+            console.log("Task.select():" + this);
+            dojo.addClass(this.contentNode, "taskContentSelected");
+            this.selected = true;
+            this.getTaskEditor().setTask(this);
+            
+        }
+        /**
+         * Set the task into de-select status
+         */
+        this.deSelect = function(){
+            dojo.removeClass(this.contentNode, "taskContentSelected");
+            this.selected = false;
+            
+        };
+        /**
+         * Delete this task and also destroy the nodes.
+         */
+        this.deleteTask = function(){
+            dojo.destroy(this.domNode);
+        }
+        /**
+         * refresh the contentNode of the task
+         */
+        this.refresh = function(){
+            if (this.contentNode != null) 
+                this.contentNode.innerHTML = this.desc;
+        }
+    }
+    /* Global Holder for selected Task reference*/
+    var selectedTask = null;
+    
+    var Thread = function(title){
+        this.taskList = new Array();
+        this.title = title;
+        this.creationTime = new Date();
+        this.id = "thread" + title;
+        this.domNode = dojo.create("div", {
+            id: this.id,
+            className: ".thread"
+        });
+        this.titleNode = dojo.create("div", {
+            id: this.id + "_title",
+            className: ".threadTitle"
+        });
+        this.newTask = function(taskDesc){
+            var newtaskId = this.newTaskId();
+            var nt = new Task(taskDesc, newtaskId, this.domNode);
+            this.taskList[this.taskList.length] = nt;
+            return nt;
+            
+            
+        };
+        this.idCounter = 0;
+        this.newTaskId = function(){
+            return this.id + "_Task_" + this.idCounter++;
+        };
+        this.deleteTask = function(task){
+            delete this.taskList[task.id];
+            task.deleteTask();
+            
+            console.log("task removed");
+        };
+        this.getSelectedTask = function(){
+            for (task in this.taskList) {
+                if (this.taskList[task].selected == true) 
+                    return this.taskList[task];
+            }
+        };
+        
+        this.getTaskList = function(){
+            return this.taskList;
+        }
+        
+        
+    };
+    /**
+     *
+     * @param {Object} TaskTitleNode  DOM Node for task title when creating new task
+     * @param {Object} createBtn   DOM Node for "create new task " button
+     * @param {Object} TaskDescField DOM Node for task desc when updating task
+     * @param {Object} updateBtn DOM Node for "update task " button
+     */
+    var TaskEditor = function(taskTitleNode, createBtn, taskDescField, updateBtn){
+    
+    
+        this.setTask = function(task){
+            console.log("TaskEditor.setTask()");
+            this.task = task;
+            this.refresh();
+        };
+        this.refresh = function(){
+            console.log("TaskEditor.refresh");
+            taskDescField.value = this.task.desc;
+        }
+        this.save = function(){
+            console.log("TaskEditor.save");
+            this.task.desc = taskDescField.value;
+            this.task.refresh();
+        }
+        //TODO TaskTitleNode is not used yet
+        this.createTask = function(){
+            console.log("TaskEditor.createTask:");
+            var newTaskDesc = taskDescField.value;
+            var thread = getActiveThread();//TODO change to getThread, and inject
+            var task = thread.newTask(newTaskDesc);
+            task.setTaskEditor(this);
+            
+        };
+        
+    }
+    
+    /***************************************
+     * Global Functions (Shall consider refactoring
+     */
+    //Test only to attach the theThread to static dom node
+    var mainThread = new Thread("Thread1");
+    
+    mainThread.domNode = dojo.byId("TheMainThread");
+    var ThreadList = {
+        newThread: function(threadTitle){
+            /* Create a new thread pane*/
+        
+        
+        },
+        
+        _threadList: [],
+    };
+    function getActiveThread(){
+        return mainThread;
+    };
+    function getTaskEditor(){
+        return taskEditor;
+    }
+    
+    /**
+     * Turn a thread into JSON string
+     * @param {Object} thread
+     */
+    function stringifyThread(thread){
+        console.log("stringifyThread");
+		var str= null;
+		try {
+			 str = JSON.stringify(getActiveThread(), function(k, v){
+				console.log('stringify handler:' + k);
+				/**
+		 * Stringify can't handle taskList, so we will save taskid into the string array
+		 */
+				if (k === "taskList") {
+					_taskList = new Array();
+					var tl = thread.getTaskList();
+					var i = 0;
+					for (t in tl) {
+					
+						_taskList[i++] = tl[t].id;
+					}
+					//return _taskList;
+					return "['hello', 'array']";
+				}
+				else 
+					return v;
+				
+				
+			});
+		}catch(e){
+			console.log(e);
+			
+		}
+        return str;
+    }
+    
+    
+    /**
+     * Turn a task into JSON String
+     */
+    function stringifyTask(task){
+        console.log("selectedTask is: " + getActiveThread().getSelectedTask());
+		if(typeof task == undefined || task == null)
+			task = getActiveThread().getSelectedTask();
+        var str = JSON.stringify(task, function(k, v){
+            return k === '_taskEditor' ? undefined : v;
+        });
+        console.log("task stringfied:" + str);
+        return str;
+        //myObject,function(k,v){return((k==='member')?undefined:v);
+    }
+    
+    var activeTask;
+    function getActiveTask(){
+        return activeTask;
+    }
+	/**
+	 * save a thread into local storage
+	 * @param {Object} thread
+	 */
+	function saveThread(thread){
+	  var tl = thread.getTaskList();
+	  stringifyThread(thread);
+		
+	}
+    
+    function saveTaskList(taskList){
+        for (task in taskList) {
+            var key = taskList[task].id;
+            var value = stringifyTask(taskList[task]);
+            save(key, value);
+        }
+    }
+    
+    /**
+     * Global function to save Tasks/Thread into local storage
+     */
+    function save(key, value, namespace){
+		console.log("save,  " + "keyName:" + key + ", value:"  + value);
+        var saveHandler = function(status, keyName){
+            console.debug("saveHandler, status=" + status + ", keyName=" + keyName);
+            if (status == dojox.storage.FAILED) {
+                alert("You do not have permission to store data for this web site. " +
+                "Press the Configure button to grant permission.");
+            }
+            else 
+                if (status == dojox.storage.SUCCESS) {
+                    // clear out the old value				
+                    console.log("Saved '" + key + "'");
+                    
+                }
+        };
+        if (typeof namespace != "undefined" && namespace != null) {
+            dojox.storage.put(key, value, saveHandler, namespace);
+        }
+        else {
+            dojox.storage.put(key, value, saveHandler);
+        }
+    }
+    
+    dojo.addOnLoad(function(){
+        console.log("dojo.addOnLoad");
+        //Connect the stringify Button
+        dojo.connect(dojo.byId("stringfyTaskBtn"), "onclick", function(){
+            console.log("stringfyTaskBtn Clicked:");
+            dojo.byId("taskStringfiedEditor").value = stringifyTask(getActiveThread().getSelectedTask());
+            
+        });
+		dojo.connect(dojo.byId("stringfyThreadBtn"), "onclick", function(){
+            console.log("stringfyThreadBtn Clicked:");
+            dojo.byId("taskStringfiedEditor").value = stringifyThread(getActiveThread());
+            
+        });
+        //create task editor with DOM Nodes    
+        var taskEditor = new TaskEditor(null, dojo.byId("taskEditorCreateBtn"), dojo.byId("taskDesc"), dojo.byId("taskEditorUpdateBtn"));
+        
+        window.taskEditor = taskEditor;
+        //connect the update Task button 										
+        dojo.connect(dojo.byId("taskEditorUpdateBtn"), "onclick", function(){
+            taskEditor.save();
+        });
+        
+        dojo.connect(dojo.byId("taskEditorCreateBtn"), "onclick", function(){
+            taskEditor.createTask()
+        });
+        dojo.connect(dojo.byId("saveTaskListBtn"), "onclick", function(){
+            saveTaskList(getActiveThread().getTaskList());
+        });
+    }); //end dojo.addOnLoad
+</script>
+</html>
