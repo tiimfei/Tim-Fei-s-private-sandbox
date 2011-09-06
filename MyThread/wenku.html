@@ -1,0 +1,118 @@
+<script type="text/javascript">
+function Reader(L){                    	
+                    	
+                    	baidu.swf.create({
+                    			id:"reader",
+                    			width:"717",
+                    			height:B,
+                    			ver:"10.0.0",
+                    			errorMessage:N,
+                    			url:"/static/flash/"+D,
+                    			bgColor:"#FFFFFF",
+                    			wmode:"window",
+                    			allowfullscreen:"true",
+                    			vars:{docurl:K,docid:M,fpn:F,npn:F,bookmark:I,ext:J,readertype:"internal",newmark:L.newmark,catal:L.catal,cdnurl:E}},O);
+                    			A(O)};
+                    		function A(N){
+                    			baidu.on(N,"mousewheel",function(P){
+                    				var R=P.wheelDelta;
+                    				var Q=-3;
+                    				if(R<0){Q=3}baidu.swf.getMovie("reader").NS_IK_doMouseWheel(Q);
+                    				baidu.preventDefault(P)});
+                    				if(window.addEventListener){
+                    					baidu.G(N).addEventListener("DOMMouseScroll",function(P){
+                    						var R=P.detail;
+                    						var Q=-3;
+                    						if(R>0){Q=3}
+                    						baidu.sswf.getMovie("reader").NS_IK_doMouseWheel(Q);
+                    						baidu.preventDefault(P)},false)
+                    						}
+                    						baidu.on("downloadflash","click",function(P){
+                    							log.send("view","downloadflash")});
+                    							var M={37:"left",39:"right"},O={left:function(){baidu.swf.getMovie("reader").NS_IK_leftKeyCode()},right:function(){baidu.swf.getMovie("reader").NS_IK_rightKeyCode()}};
+                    							baidu.on(document,"keydown",function(R){var P=R.which||R.keyCode,Q=M[P];if(Q){O[Q]();log.send("view","keycode"+Q)}})}}var wenku_logo=new Image();wenku_logo.src="http://img.baidu.com/img/iknow/docshare/bdwenku.gif";
+                    							
+                    							var DOC_INFO={
+                    								doc_id:"3ff1932bbd64783e09122b50",cid:"539",price:"8",value_average:"7",
+                    								doc_size:"12.1MB",doc_name:'费马大定理',doc_type:"pdf",url:"http://wenku.baidu.com",
+                    								wealth:parseInt('5'),level:parseInt('2'),isOrgDoc:'0',
+                    								catal:"0",isAdmin:""};
+                    							var _reader=new Reader({newmark:'0|0',catal:DOC_INFO.catal});_reader.create("readerContainer","3ff1932bbd64783e09122b50");
+                    							baidu.each(["selfChangeCategory","adminChangeCategory","selfChangePrice"],function(B,A){
+                    								baidu.on(B,"click",function(C){login.verlogin(baidu.proxy(view.changeDocInfo,B));baidu.preventDefault(C)})});
+                    							baidu.on("addToStore","click",function(A){login.check(view.cang(A));if(parseInt(DOC_INFO.isOrgDoc)){log.send("org","org_favo")}
+                    							baidu.preventDefault(A)});
+                    							var _tmpprivate="0";if(_tmpprivate==0){baidu.on("shareDoc","click",function(A){log.send("api","share",{subtype:"button",cid:baidu.G("cateList0")?baidu.G("cateList0").href.split("/")[4]:""});view.shareDoc();baidu.preventDefault(A)});
+                    							baidu.on("addToAlbum","click",function(A){login.check(view.addToAlbum);baidu.preventDefault(A)});
+                    							if(baidu.g("impeachDoc")){baidu.on("impeachDoc","click",function(A){login.check(view.impeachDoc(DOC_INFO.doc_id));
+                    							log.imageReq("/tongji/shop.gif?bn=0&pv=jubaoicon&t="+new Date().getTime());
+                    	baidu.preventDefault(A)})}}
+                    	
+                    	baidu.each(["downloadTop","downloadButton"],
+                    	function(A){baidu.on(A,"click",
+                    	function(C){
+                    		var D=baidu.G("cateList0")?baidu.G("cateList0").href.split("/")[4]:"";
+                    		var B=DOC_INFO.doc_type;
+                    		if(A=="downloadButton"){
+                    			log.send("down","download",{fr:"down",cid:D,doctype:B})
+                    		}
+                    		if(isLec){
+                    			log.send("lec","download")
+                    		}
+                    		if(parseInt(DOC_INFO.isOrgDoc)){
+                    			log.send("org","org_down")
+                    		}
+                    		login.verlogin(view.download);
+                    		baidu.preventDefault(C)
+                    		})});
+                    		
+                    		var rate=new Rate("rateContainer");if(_tmpprivate==0){rate.create("7")}else{rate.setvalue("7")}if(G("kw")){G("kw").value=""}baidu.on(window,"unload",function(A){view.saveViewedPage()});var DownloadFlag=window.location.hash;if(DownloadFlag&&DownloadFlag=="#flag"){login.check(view.download)}function uploadDoc(A){log.send("submit","submit",{fr:"view"});location.href="http://wenku.baidu.com/new?fr=view";baidu.preventDefault(A)}if(parseInt(DOC_INFO.isOrgDoc)){log.send("org","org_docview")}var AddLogo=function(){var B=function(D){var E=/.*\/4866d3323968011ca300915d.html/ig;return E.test(D)},C=function(E){var D=E,F=D.children;return F.length},A=function(E,F){var D=window.location.href;if(B(D)&&!C(E)){E.innerHTML=F}};return{init:function(D,E){A(D,E)}}}();AddLogo.init(baidu.G("FriendsCor"),'<a href="http://www.fanshu.com" target="_blank" onclick="log.send(\'org\',\'fanshu_site\');"><img src="http://img.baidu.com/img/iknow/docshare/fanshu.jpg" /></a>');function flashresush(){var A="7";if(A!=3){var C=document.documentElement.clientHeight-5;if(C<0){C=0}var B=baidu.swf.getMovie("reader");B.height=C}}window.onresize=helper.onFooEndFunc(flashresush);(function(win,doc,undefined){if(win.wenku===undefined){win.wenku={}}var newmark=!!("");wenku.setBookMark=function(info){var save=false,readerMovie=baidu.swf.getMovie("reader"),isLogin=!!("1"),tmpinfo,getPagethOnClose,getPageOffset;if(info){tmpinfo=info.split("|");getPagethOnClose=tmpinfo[0];getPageOffset=tmpinfo[1]}else{getPagethOnClose=readerMovie.NS_IK_getPagethOnClose();getPageOffset=readerMovie.NS_IK_getPageOffset();info=getPagethOnClose+"|"+getPageOffset}var saveMark=function(data){if(data.save){save=true}};login.checksynch(function(){baidu.ajax.request("/submit",{onsuccess:function(xhr){if(xhr.status===200){var responseText=eval("("+xhr.responseText+")");saveMark(responseText)}},method:"POST",data:"ct=20109&doc_id=3ff1932bbd64783e09122b50&page="+getPagethOnClose+"&offset="+getPageOffset,async:false})},function(){view.saveViewedPage();login.log()});var isPrivate=!!("");if(isPrivate){readerMovie.showNewMarkInfo('<FONT FACE="宋体" SIZE="12" COLOR="#000000">该文档未审核通过，暂无法使用书签功能。</FONT>',0);return false}if(save){if(!newmark){readerMovie.showNewMarkInfo('<FONT FACE="宋体" SIZE="12" COLOR="#000000">添加书签成功，可以进入我的文库中查看</FONT><FONT><a target="_blank" href="/user/bookmark">>>点击查看</a></FONT>',1);newmark=true}else{readerMovie.showNewMarkInfo('<FONT FACE="宋体" SIZE="12" COLOR="#000000">添加书签成功！新添加的书签将覆盖之前的书签。</FONT><FONT><a target="_blank" href="/user/bookmark">>>点击查看</a></FONT>',1)}}else{if(isLogin){readerMovie.showNewMarkInfo('<FONT FACE="宋体" SIZE="12" COLOR="#f00000">添加书签失败，请您稍后重新尝试！</FONT>',0)}}}})(window,document);(function(C,B,D){var A=B.getElementsByTagName("h1")[0];A.innerHTML=helper.wbr(A.innerHTML)})(window,document);(function(C,B,D){var A=function(){return new Function('return []')()};helper.lang.module("wenku.seriesDocCallBack",A)})(window,document);(function(C,B,D){var A=helper.q("Score")[0];baidu.on(A,"click",function(E){view.help();baidu.preventDefault(E)})})(window,document);(function(win,doc,undefined){try{function literatureCallback(){var totalPage=Math.ceil(literatureCarousel.totalCount/literatureCarousel.pageSize),currPage=Math.ceil((literatureCarousel.scrollIndex+1)/literatureCarousel.pageSize),btn0=baidu.g("literaturePreButton"),btn1=baidu.g("literatureNextButton");if(currPage<=1){baidu.dom.setAttr(btn0,"class","wk-book-view-pre_off")}else{baidu.dom.setAttr(btn0,"class","wk-book-view-pre_on")}if(currPage>=totalPage){baidu.dom.setAttr(btn1,"class","wk-book-view-next_off")}else{baidu.dom.setAttr(btn1,"class","wk-book-view-next_on")}}var literatureInner=baidu.dom.children(baidu.g("literatureElement")),literatureStr=[];for(i=0;i<literatureInner.length;i++){literatureStr.push({content:literatureInner[i].innerHTML})}var literatureCarousel=baidu.ui.carousel.create({target:baidu.g("literatureWraper"),pageSize:5,showButton:false,contentText:literatureStr,onafterscroll:literatureCallback});literatureCarousel.scrollTo(0);baidu.dom.ready(function(){baidu.event.on("literaturePreButton","click",function(e){literatureCarousel.prevPage();return false});baidu.event.on("literatureNextButton","click",function(e){literatureCarousel.nextPage();return false})})}catch(e){}var juclewclose=baidu.q("wk-juclew-close");baidu.each(juclewclose,function(item){baidu.event.on(item,"mouseover",function(e){baidu.addClass(item,"jbshow")});baidu.event.on(item,"mouseout",function(e){baidu.removeClass(item,"jbshow")})});var jb_close=baidu.g("wk-impeachDoc-close");var jb_ok=baidu.g("wk-impeachDoc-ok");if(jb_close){baidu.on(jb_close,"click",function(){baidu.hide("wk-impeachDoc-div");if(baidu.g("wk-impeachDoc-con").style.display!="none"){log.imageReq("/tongji/shop.gif?bn=0&pv=jubaoclose&t="+new Date().getTime())}})}if(jb_ok){baidu.on(jb_ok,"click",function(){baidu.hide("wk-impeachDoc-div")})}var jb_submit=baidu.g("wk-impeachDoc-submit");var impeachmoreobj=baidu.g("wk-impeach-more");if(baidu.browser.ie){baidu.on(impeachmoreobj,"propertychange",function(){if(impeachmoreobj.value.length>100){impeachmoreobj.value=impeachmoreobj.value.substring(0,100)}impeachmoreobj.focus()})}else{baidu.on(impeachmoreobj,"input",function(){if(impeachmoreobj.value.length>100){impeachmoreobj.value=impeachmoreobj.value.substring(0,100);impeachmoreobj.focus()}})}if(jb_submit){baidu.on(jb_submit,"click",function(){var _tmpreason="";var impeachmore=impeachmoreobj.value;var sl=baidu.g("impeachDoc-sl");var radio=sl.getElementsByTagName("input");for(var i=0;i<radio.length;i++){if(radio[i].checked){_tmpreason=radio[i].value}}if(impeachmore!=""){_tmpreason=_tmpreason+","+impeachmore.substring(0,100)}baidu.ajax.post("/submit?cmd=20116","report_reason="+_tmpreason+"&doc_id="+DOC_INFO.doc_id+"&ct=20116",function(xhr,responseText){var obj=eval("("+xhr.responseText+")");if(obj.status==0){baidu.hide("wk-impeachDoc-con");baidu.show("wk-impeachDoc-over")}else{if(obj.status==1){alert("您已经举报过此文档")}}});log.imageReq("/tongji/shop.gif?bn=0&pv=jubaosubmit&t="+new Date().getTime())})}})(window,document);(function(H,L,D){var E=function(P,O){baidu.each(P,function(R,Q){baidu.on(R,"click",function(){var S=new Date().getTime();log.imageReq("/tongji/shop.gif?bn=0&pv="+O+"&t="+S)})})},M=function(){var P=baidu.dom.query("#literatureWraper a"),O=baidu.dom.query(".wenku-join-btn a");E(P,"ugc");E(O,"viewrightbanner")};M();var C="0",F=baidu.g("wk-xueshu"),K="3ff1932bbd64783e09122b50",J=baidu.g("wk-jb-ts");if(C==8){log.send("view","xs",{gurl:K})}if(F){baidu.event.on(F,"click",function(O){log.send("view","xs_ad",{gurl:K})})}if(J){baidu.on(J,"click",function(){log.imageReq("/tongji/shop.gif?bn=0&pv=jubaots&t="+new Date().getTime())})}var B="6";var A="79";var N="539";var I="/tongji/view.html?type=viewload&cid1="+B+"&cid2="+A+"&cid3="+N+"&doctype="+DOC_INFO.doc_type;log.imageReq(I+"&t="+new Date().getTime())})(window,document);
+</script>
+<script type="text/javascript">
+var H = function(O, M){
+    for (var N in M) {
+        if (M.hasOwnProperty(N)) {
+            O[N] = M[N]
+        }
+    }
+    return O
+};
+		L=H({newmark:"",lastview:""},L);
+        function C(){
+            var M = baidu.swf.getVersion(), N;
+            if (M) {
+                N = M.slice(0, M.indexOf("."));
+                if (N < 9) {
+                    N = M
+                }
+                else {
+                    log.send("view", "flashload", {
+                        subtype: "jsrequest"
+                    });
+                    return true
+                }
+            }
+            else {
+                N = 0
+            }
+            log.send("view", "reader", {
+                flashver: N
+            });
+            return false
+        }
+		
+                var B=700,J=DOC_INFO.doc_type,I=cookie.get("newMark");
+                    		if(!I){I=view.getViewedPage()}else{I=I.split("|");I=I.slice(1,3).join("|");cookie.del("newMark","/view/")}
+                    		var D=J=="txt"?"txtreader.swf":"reader.swf";
+                    		B=document.documentElement.clientHeight-5;
+                    		if(/(ppt|pps|pot|pptx)/.test(J)){B=516}
+                    		var F=J=="txt"?50:5;var K=J=="txt"?"http://wenku.baidu.com/play":"http://ai.wenku.baidu.com/play";
+                    		var E=J=="txt"?"http://txt.wenku.baidu.com/play":"http://ai.wenku.baidu.com/play";
+                    		this.create=function(O,M){var N=(C())?"":'<p class="ml">文档预览需要最新版本的Flash Player支持。</p><p class="ml">您尚未安装或版本过低，建议您：</p><a id="downloadflash" href="http://www.adobe.com/cn/products/flashplayer/" target="_blank"><img src="http://box.zhangmen.baidu.com/images/setupflash.gif" height="39" width="273" /></a>';
+                    		
+        //=========================
+        var bds_config = {
+            render: false
+        };
+        document.getElementById("bdshell_js").src = "http://share.baidu.com/static/js/shell_v2.js?t=" + new Date().getHours();
+</script>
