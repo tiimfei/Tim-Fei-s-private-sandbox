@@ -14,6 +14,7 @@
             dojo.require("dojo.data.ItemFileReadStore");
             dojo.require("dijit.form.Button");
             dojo.require("dijit.form.Select");
+			dojo.require("dijit.form.ToggleButton");
             dojo.require("dojo.fx");
             var rowWidth = 3;
             var iconWidth = 200;
@@ -48,7 +49,7 @@
                     type: "app",
                 }, {
                     idd: "item5",
-                    name: "textedit",
+                    name: "atextedit",
                     image: "images/textedit.png",
                     size: 500,
                     type: "app",
@@ -151,13 +152,25 @@
             }
             
             dojo.addOnLoad(function(){
-            
-                //sortItems("size", false);
+        		    var isDescendingBtn = new dijit.form.ToggleButton({
+						
+                    showLabel: true,
+                    checked: false,
+					label: "isDescending",
+                    onChange: function(val) {
+                       // this.attr('label', val)
+                    },
+                  iconClass:"dijitCheckBoxIcon",
+                },
+                "isDescending");
+        
                 initImages();
-                dojo.connect(button, "onChange", function(){
-                    sortItem(sortBy.value, isDescending.value);
+                dojo.connect(sortBy, "onChange", function(){
+                    sortItems(sortBy.value, dijit.byId("isDescending").checked);
                 });
-                
+                dojo.connect(dijit.byId("isDescending"), "onChange", function(){
+                    sortItems(sortBy.value, dijit.byId("isDescending").checked);
+                });
             });
         </script>
         <body class="claro">
@@ -168,6 +181,7 @@
                 <option value="size" selected="selected">Size</option>
                 <option value="age">Age</option>
             </select>
+			<button id="isDescending">is Descending?</button>
             <img id="item1"/><img id="item2"/><img id="item3"/><img id="item4"/><img id="item5"/>
         </body>
         <html>
