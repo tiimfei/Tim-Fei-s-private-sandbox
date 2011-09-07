@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr">
+    <head>
+        <style type="text/css">
+            body, html {
+                font-family: helvetica, arial, sans-serif;
+                font-size: 90%;
+            }
+            
+            /* Start right*/
+            .person_fellow {
+                padding: 8px 15px;
+            }
+            
+            .fellow_name {
+                font-size: 14px;
+                text-align: center;
+            }
+            
+            .person_fellow_photo {
+                padding: 2px;
+                border: 1px solid #CCCCCC;
+                float: left;
+            }
+            
+            .person_fellow_action {
+                float: left;
+                margin-left: 18px;
+            }
+            
+            .dijitButtonText {
+                padding: 0 10px !important;
+            }
+            
+            .topic_list ul li {
+                margin-left: 25px;
+                line-height: 30px;
+            }
+            
+            /* End right*/
+        </style>
+        <script type="text/javascript" src="./dojo/dojo/dojo.js" djConfig="parseOnLoad: true">
+        </script>
+        <link rel="stylesheet" type="text/css" href="./dojo/dijit/themes/claro/claro.css" />
+        <script type="text/javascript">
+            dojo.require("dojo.data.ItemFileReadStore");
+            dojo.require("dijit.form.Button");
+            dojo.require("dijit.form.Select");
+            dojo.require("dijit.form.ToggleButton");
+            dojo.require("dojo.fx");
+            var rowWidth = 3;
+            var iconWidth = 200;
+            var iconHeight = 200;
+            var topBase = 100;
+            var leftBase = 100;
+            var storeData = {
+                identifier: 'name',
+                items: [{
+                    node: "person0",
+                    name: "Elvis",
+                    image: "images/profilePic/0.jpg",
+                    fans: 100,
+                    type: "app",
+                }, {
+                    node: "person1",
+                    name: "Nate",
+                    image: "images/profilePic/1.jpg",
+                    fans: 200,
+                    type: "app",
+                }, {
+                    node: "person2",
+                    name: "Evan",
+                    image: "images/profilePic/2.jpg",
+                    fans: 300,
+                    type: "app",
+                }, {
+                    node: "person3",
+                    name: "John",
+                    image: "images/profilePic/3.jpg",
+                    fans: 400,
+                    type: "app",
+                }, {
+                    node: "person4",
+                    name: "Michael",
+                    image: "images/profilePic/4.jpg",
+                    fans: 500,
+                    type: "app",
+                }, {
+                    node: "person5",
+                    name: "Paul",
+                    image: "images/profilePic/5.jpg",
+                    fans: 600,
+                    type: "app",
+                }
+				]
+            }
+            //Callback for if the lookup fails.
+            function fetchFailed(error, request){                
+				console.log("error in fetch:" + error);
+				alert("lookup failed.");
+            }
+            
+            function clearSortedList(size, request){
+                return;
+            }
+            
+            function calcNewPositions(items){
+                // 5 items a row
+                var animations = [];
+                
+                for (var i = 0; i < items.length; i++) {
+                    currentRow = Math.round(i / rowWidth - 0.5);
+                    currentColumn = i % rowWidth;
+                    items[i].top = currentRow * iconHeight + topBase;
+                    items[i].left = currentColumn * iconWidth + leftBase;
+                    items[i].anim = dojo.fx.slideTo({
+                        node: profilesStore.getValue(items[i], "node"),
+                        top: items[i].top,
+                        left: items[i].left,
+						duration: 500,
+                    })
+                    animations[i] = items[i].anim;
+                    
+                }
+                console.log("play the slide")
+                dojo.fx.combine(animations).play();
+            }
+            
+            function playAnimation(items, request){
+            
+                calcNewPositions(items);
+                printItems(items);
+                
+            }
+            
+            function printItems(items){
+                for (var i = 0; i < items.length; i++) 
+                    console.log("name:" + items[i].name + ",fans:" + items[i].fans + ",top:" + items[i].top + ",left:" + items[i].left);
+            }
+            
+            /**
+             *
+             */
+            function sortItems(sortBy, isDescending){
+                console.log("sortItems:" + "sortBy:" + sortBy + ", descending:" + isDescending);
+                //Fetch the data items in a sorted order.                
+                var sortKeys = [{
+                    attribute: sortBy,
+                    descending: isDescending,
+                }];
+                profilesStore.fetch({
+                    onBegin: clearSortedList,
+                    //calc new position and play the animation
+                    onComplete: playAnimation,
+                    onError: fetchFailed,
+                    sort: sortKeys,
+                });
+                
+            }
+            
+            function setImage(items, request){
+                console.log("enter setImage");
+                calcNewPositions(items);
+            }
+         
+		     
+			function initPersons(){
+				profilesStore.fetch({
+                    onBegin: clearSortedList,
+                    onComplete: setImage,
+                    onError: fetchFailed,
+                });
+			}
+            dojo.addOnLoad(function(){
+            
+                initPersons();
+                dojo.connect(sortBy, "onChange", function(){
+                    sortItems(sortBy.value, isDescending.checked);
+                });
+                dojo.connect(isDescending, "onChange", function(){
+                    sortItems(sortBy.value, isDescending.checked);
+                });
+            });
+        </script>
+    </head>
+    <body class="claro">
+        <div dojoType="dojo.data.ItemFileReadStore" data="storeData" jsId="profilesStore">
+        </div>
+        <select name="sortBy" dojoType="dijit.form.Select" jsId="sortBy">
+            <option value="name">名字</option>
+            <option value="fans" selected="selected">粉丝数</option>            
+        </select>
+        <button dojoType="dijit.form.ToggleButton" jsId="isDescending" iconClass="dijitCheckBoxIcon">
+            is Descending?
+        </button>
+        <div id="maybe_know_person">
+            <div style="padding:12px 8px;" id="person_text">
+                您可能感兴趣的人
+            </div>
+            <div class="person_fellow" id="person0">
+                <div class="person_fellow_photo">
+                    <img src="images/profilePic/0.jpg"/>
+                </div>
+                <div class="person_fellow_action">
+                    <p class="fellow_name">
+                        Elvis 粉丝: 100
+                    </p>
+                    
+                    <button class="fellow_button" dojoType="dijit.form.Button">
+                        <span style="font-size:12px">关  注</span>
+                    </button>
+                </div>
+                <div style="clear:both">
+                </div>
+            </div>
+            <div class="person_fellow" id="person1">
+                <div class="person_fellow_photo">
+                    <img src="images/profilePic/1.jpg"/>
+                </div>
+                <div class="person_fellow_action">
+                    <p class="fellow_name">
+                        Nate 粉丝: 200
+                    </p>
+                    <button class="fellow_button" dojoType="dijit.form.Button">
+                        <span style="font-size:12px">关  注</span>
+                    </button>
+                </div>
+                <div style="clear:both">
+                </div>
+            </div>
+            <div class="person_fellow" id="person2">
+                <div class="person_fellow_photo">
+                    <img src="images/profilePic/2.jpg"/>
+                </div>
+                <div class="person_fellow_action">
+                    <p class="fellow_name">
+                        Evan 粉丝： 300
+                    </p>
+                    <button class="fellow_button" dojoType="dijit.form.Button">
+                        <span style="font-size:12px">关  注</span>
+                    </button>
+                </div>
+                <div style="clear:both">
+                </div>
+            </div>
+			 <div class="person_fellow" id="person3">
+                <div class="person_fellow_photo">
+                    <img src="images/profilePic/3.jpg"/>
+                </div>
+                <div class="person_fellow_action">
+                    <p class="fellow_name">
+                        John 粉丝：400
+                    </p>
+                    <button class="fellow_button" dojoType="dijit.form.Button">
+                        <span style="font-size:12px">关  注</span>
+                    </button>
+                </div>
+                <div style="clear:both">
+                </div>
+            </div>
+			 <div class="person_fellow" id="person4">
+                <div class="person_fellow_photo">
+                    <img src="images/profilePic/4.jpg"/>
+                </div>
+                <div class="person_fellow_action">
+                    <p class="fellow_name">
+                        Michael 粉丝：500
+                    </p>
+					
+                    <button class="fellow_button" dojoType="dijit.form.Button">
+                        <span style="font-size:12px">关  注</span>
+                    </button>
+                </div>
+                <div style="clear:both">
+                </div>
+            </div>
+			 <div class="person_fellow" id="person5">
+                <div class="person_fellow_photo">
+                    <img src="images/profilePic/5.jpg"/>
+                </div>
+                <div class="person_fellow_action">
+                    <p class="fellow_name">
+                        Paul 粉丝： 600
+                    </p>
+                    <button class="fellow_button" dojoType="dijit.form.Button">
+                        <span style="font-size:12px">关  注</span>
+                    </button>
+                </div>
+                <div style="clear:both">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
