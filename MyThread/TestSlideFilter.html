@@ -74,7 +74,7 @@
                     items[i].top = currentRow * iconHeight + topBase;
                     items[i].left = currentColumn * iconWidth + leftBase;
                     items[i].anim = dojo.fx.slideTo({
-                        node: items[i].idd[0],
+                        node: appStore.getValue(items[i], "idd"),
                         top: items[i].top,
                         left: items[i].left
                     })
