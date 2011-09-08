@@ -60,65 +60,85 @@
                     name: "Elvis",
                     image: "images/profilePic/0.jpg",
                     fans: 100,
-                    type: "app",
+                    gender: "male",
                 }, {
                     node: "person1",
                     name: "Nate",
                     image: "images/profilePic/1.jpg",
                     fans: 200,
-                    type: "app",
+                    gender: "female",
                 }, {
                     node: "person2",
                     name: "Evan",
                     image: "images/profilePic/2.jpg",
                     fans: 300,
-                    type: "app",
+                    gender: "male",
                 }, {
                     node: "person3",
-                    name: "John",
+                    name: "Lisa",
                     image: "images/profilePic/3.jpg",
                     fans: 400,
-                    type: "app",
+                    gender: "female",
                 }, {
                     node: "person4",
                     name: "Michael",
                     image: "images/profilePic/4.jpg",
                     fans: 500,
-                    type: "app",
+                    gender: "male",
                 }, {
                     node: "person5",
                     name: "Paul",
                     image: "images/profilePic/5.jpg",
                     fans: 600,
-                    type: "app",
-                }
-				]
+                    gender: "male",
+                }]
             }
             //Callback for if the lookup fails.
-            function fetchFailed(error, request){                
-				console.log("error in fetch:" + error);
-				alert("lookup failed.");
+            function fetchFailed(error, request){
+                console.log("error in fetch:" + error);
+                alert("lookup failed.");
             }
             
             function clearSortedList(size, request){
                 return;
             }
             
-            function calcNewPositions(items){
+            function calcNewPositions(items, gender){
+                console.log("calcNewPositins, gender filter value:" + gender);
                 // 5 items a row
                 var animations = [];
-                
+                itemSeq = 0;
                 for (var i = 0; i < items.length; i++) {
-                    currentRow = Math.round(i / rowWidth - 0.5);
-                    currentColumn = i % rowWidth;
-                    items[i].top = currentRow * iconHeight + topBase;
-                    items[i].left = currentColumn * iconWidth + leftBase;
-                    items[i].anim = dojo.fx.slideTo({
-                        node: profilesStore.getValue(items[i], "node"),
-                        top: items[i].top,
-                        left: items[i].left,
-						duration: 500,
-                    })
+                    if (gender != undefined && gender != "all" && profilesStore.getValue(items[i], "gender") != gender) {
+                        items[i].anim = dojo.fadeOut({
+                            node: profilesStore.getValue(items[i], "node"),
+                            duration: 500
+                        });
+                        items[i].display = false; // mark it will be hidden
+                    }
+                    else {
+                        currentRow = Math.round(itemSeq / rowWidth - 0.5);
+                        currentColumn = itemSeq % rowWidth;
+						itemSeq++;
+                        items[i].top = currentRow * iconHeight + topBase;
+                        items[i].left = currentColumn * iconWidth + leftBase;
+                       
+                        items[i].anim =  dojo.fx.slideTo({
+                            node: profilesStore.getValue(items[i], "node"),
+                            top: items[i].top,
+                            left: items[i].left,
+                            duration: 500}) ;							
+						
+						//if this item is in hidden status,we need to fade it in first
+					   if (items[i].display != undefined && items[i].display == false) {
+                            items[i].anim = dojo.fx.chain([items[i].anim, dojo.fadeIn({
+                                node: profilesStore.getValue(items[i], "node"),
+                                duration: 500,
+                            })]);
+                            items[i].display = true;
+                        }
+                        
+                    }
                     animations[i] = items[i].anim;
                     
                 }
@@ -126,9 +146,9 @@
                 dojo.fx.combine(animations).play();
             }
             
-            function playAnimation(items, request){
-            
-                calcNewPositions(items);
+            function sortAndPlayAnimation(items, request){            
+                console.log("enter sortAndPlayAnimation");
+                calcNewPositions(items, this.gender);
                 printItems(items);
                 
             }
@@ -141,17 +161,19 @@
             /**
              *
              */
-            function sortItems(sortBy, isDescending){
-                console.log("sortItems:" + "sortBy:" + sortBy + ", descending:" + isDescending);
+            function sortItems(sortBy, isDescending, gender){
+                console.log("sortItems:" + "sortBy:" + sortBy + ", descending:" + isDescending + ", gender:" + gender);
                 //Fetch the data items in a sorted order.                
                 var sortKeys = [{
                     attribute: sortBy,
                     descending: isDescending,
                 }];
+                var sortFilter = [];
+                sortFilter.gender = gender;                
                 profilesStore.fetch({
                     onBegin: clearSortedList,
                     //calc new position and play the animation
-                    onComplete: playAnimation,
+                    onComplete: dojo.hitch(sortFilter, sortAndPlayAnimation),
                     onError: fetchFailed,
                     sort: sortKeys,
                 });
@@ -160,25 +182,29 @@
             
             function setImage(items, request){
                 console.log("enter setImage");
-                calcNewPositions(items);
+                calcNewPositions(items, genderSelect.value);
             }
-         
-		     
-			function initPersons(){
-				profilesStore.fetch({
+            
+            
+            function initPersons(){
+                profilesStore.fetch({
                     onBegin: clearSortedList,
                     onComplete: setImage,
                     onError: fetchFailed,
                 });
-			}
-            dojo.addOnLoad(function(){
+            }
             
+            dojo.addOnLoad(function(){            
                 initPersons();
                 dojo.connect(sortBy, "onChange", function(){
-                    sortItems(sortBy.value, isDescending.checked);
+                    sortItems(sortBy.value, isDescending.checked, genderSelect.value);
                 });
                 dojo.connect(isDescending, "onChange", function(){
-                    sortItems(sortBy.value, isDescending.checked);
+					
+                    sortItems(sortBy.value, isDescending.checked, genderSelect.value);
+                });
+                dojo.connect(genderSelect, "onChange", function(){					
+                    sortItems(sortBy.value, isDescending.checked, genderSelect.value);
                 });
             });
         </script>
@@ -186,13 +212,20 @@
     <body class="claro">
         <div dojoType="dojo.data.ItemFileReadStore" data="storeData" jsId="profilesStore">
         </div>
-        <select name="sortBy" dojoType="dijit.form.Select" jsId="sortBy">
+		<div>排序条件</div>
+        <select name="sortBy" dojoType="dijit.form.Select" jsId="sortBy" label="排序条件">
             <option value="name">名字</option>
-            <option value="fans" selected="selected">粉丝数</option>            
+            <option value="fans" selected="selected">粉丝数</option>
         </select>
-        <button dojoType="dijit.form.ToggleButton" jsId="isDescending" iconClass="dijitCheckBoxIcon">
-            is Descending?
+        <button dojoType="dijit.form.ToggleButton" jsId="isDescending" label="降序?" iconClass="dijitCheckBoxIcon">
+            	
         </button>
+		<div>过滤条件</div>
+        <select name="gender" dojoType="dijit.form.Select" jsId="genderSelect">
+            <option value="all" selected="selected">所有</option>
+            <option value="female">女性</option>
+            <option value="male" selected="selected">男性</option>
+        </select>
         <div id="maybe_know_person">
             <div style="padding:12px 8px;" id="person_text">
                 您可能感兴趣的人
@@ -205,7 +238,6 @@
                     <p class="fellow_name">
                         Elvis 粉丝: 100
                     </p>
-                    
                     <button class="fellow_button" dojoType="dijit.form.Button">
                         <span style="font-size:12px">关  注</span>
                     </button>
@@ -243,7 +275,7 @@
                 <div style="clear:both">
                 </div>
             </div>
-			 <div class="person_fellow" id="person3">
+            <div class="person_fellow" id="person3">
                 <div class="person_fellow_photo">
                     <img src="images/profilePic/3.jpg"/>
                 </div>
@@ -258,7 +290,7 @@
                 <div style="clear:both">
                 </div>
             </div>
-			 <div class="person_fellow" id="person4">
+            <div class="person_fellow" id="person4">
                 <div class="person_fellow_photo">
                     <img src="images/profilePic/4.jpg"/>
                 </div>
@@ -266,7 +298,6 @@
                     <p class="fellow_name">
                         Michael 粉丝：500
                     </p>
-					
                     <button class="fellow_button" dojoType="dijit.form.Button">
                         <span style="font-size:12px">关  注</span>
                     </button>
@@ -274,7 +305,7 @@
                 <div style="clear:both">
                 </div>
             </div>
-			 <div class="person_fellow" id="person5">
+            <div class="person_fellow" id="person5">
                 <div class="person_fellow_photo">
                     <img src="images/profilePic/5.jpg"/>
                 </div>
