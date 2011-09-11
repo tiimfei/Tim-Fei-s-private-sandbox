@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js">
+        </script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js">
+        </script>
+        <style type="text/css" media="screen">
+            .square {
+                width: 144px;
+                height: 144px;
+                background: #ff8040;
+                margin-right: 48px;
+                float: left;
+            }
+            
+            .transformed0 {
+                -webkit-transform: rotate(3deg);
+                -moz-transform: rotate(3deg);
+                -ms-transform: rotate(3deg);
+                transform: rotate(3deg);
+            }
+            
+            .transformed1 {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            
+            .transformed2 {
+                -webkit-transform: rotate(357deg);
+                -moz-transform: rotate(357deg);
+                -ms-transform: rotate(357deg);
+                transform: rotate(357deg);
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                direction = 1; // 1, -1
+                state = 1; // (0,1,2);
+                oldClass = "";
+				
+                setInterval(function(){
+                	
+                    $("#target").removeClass(oldClass);
+                    if (state + direction > 2 || state + direction < 0) {
+                        direction = -direction;
+                    }
+                    state = state + direction;
+                    newClass = "transformed" + state;
+                    console.log("set new class to " + newClass);
+                    $("#target").addClass(newClass);
+                    $("#target").innerText = newClass;
+                    oldClass = newClass;
+                    
+                    
+                }, 70);
+                
+            });
+        </script>
+    </head>
+    <body style="font-size:100%;">
+        <div id="target" class="square">
+        	<img src="http://avatar.csdn.net/2/3/6/3_tiimfei.jpg" />
+            <p>
+                Lorem ipsum dolor sit amet.
+            </p>
+        </div>
+		<button id="toggle"></button>
+    </body>
+</html>
