@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js">
-        </script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js">
+        <style type="text/css">
+            
+            @import "./dojo/dijit/themes/claro/claro.css";
+        </style>
+        <script src="./dojo/dojo/dojo.js" djConfig="parseOnLoad: true">
         </script>
         <style type="text/css" media="screen">
             .square {
-                width: 144px;
-                height: 144px;
+                width: 55px;
+                height: 55px;
                 background: #ff8040;
-                margin-right: 48px;
                 float: left;
+                -moz-border-radius: 10px;
             }
+			.person {
+				margin-left:3px;
+				margin-top: 3px;
+			}
             
             .transformed0 {
                 -webkit-transform: rotate(3deg);
@@ -37,37 +42,64 @@
             }
         </style>
         <script>
-            $(document).ready(function(){
-                direction = 1; // 1, -1
-                state = 1; // (0,1,2);
-                oldClass = "";
-				
-                setInterval(function(){
-                	
-                    $("#target").removeClass(oldClass);
-                    if (state + direction > 2 || state + direction < 0) {
-                        direction = -direction;
-                    }
-                    state = state + direction;
-                    newClass = "transformed" + state;
-                    console.log("set new class to " + newClass);
-                    $("#target").addClass(newClass);
-                    $("#target").innerText = newClass;
-                    oldClass = newClass;
-                    
-                    
-                }, 70);
+            dojo.require("dijit.form.ToggleButton");
+			var stopShake=false;
+            var Shake = function(node, degree, timeInterval){
+                this.node = node;
+                this.degree = degree;
+                this.timeInterval = timeInterval;
                 
+                this.play = function(){
+                    this.direction = 1; // 1, -1
+                    this.state = 1; // 0, 1, 2
+                    this.oldClass = "";
+                    this._rotate();
+                    
+                }
+                Shake.prototype._rotate = function(){
+                    dojo.removeClass(dojo.byId(this.node), this.oldClass);
+                    this.state = this.state + this.direction;
+                    if (this.state >= 2 || this.state <= 0) {
+                        this.direction = -this.direction;
+                    }
+                    
+                    newClass = "transformed" + this.state;
+                    console.log("set new class to " + newClass);
+                    dojo.addClass(dojo.byId(this.node), newClass);
+                    
+                    this.oldClass = newClass;
+					console.log("check stopShake:" + stopShake);
+                    if (!stopShake) 
+                        setTimeout(dojo.hitch(this, this._rotate), this.timeInterval);
+                    
+                    
+                };
+                
+            }
+            
+            dojo.ready(function(){
+                var s = new Shake("target", 5,70);
+                s.play();
+                dojo.connect(Wiggle, "onClick", function(){
+					
+                    stopShake ? stopShake = false : stopShake = true;
+					console.log("set stopShake: " + stopShake);
+					if(!stopShake)
+						s.play();
+					  
+                });
             });
         </script>
     </head>
-    <body style="font-size:100%;">
+    <body style="font-size:100%;" class="claro">
         <div id="target" class="square">
-        	<img src="http://avatar.csdn.net/2/3/6/3_tiimfei.jpg" />
+            <img class="person" src="http://avatar.csdn.net/2/3/6/3_tiimfei.jpg" />
             <p>
-                Lorem ipsum dolor sit amet.
+                Nate
             </p>
         </div>
-		<button id="toggle"></button>
+        <button dojoType="dijit.form.ToggleButton" jsId="Wiggle" iconClass="dijitCheckBoxIcon">
+            Wiggle
+        </button>
     </body>
 </html>
