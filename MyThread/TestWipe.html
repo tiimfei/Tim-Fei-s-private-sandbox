@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Tutorial: dojo.fx.wipeIn and dojo.fx.wipeOut</title>
+        <style>
+            
+            .red-block {
+                background-color: red;
+                width: 100px;
+                height: 100px;
+            }
+            
+            .section {
+                height: 17px;
+                width: 400px;
+                overflow: hidden;
+            }
+        </style>
+        <!-- load dojo and provide config via data attribute --><!-- <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.0/dojo/dojo.xd.js" data-dojo-config="isDebug: true,parseOnLoad: true"> -->
+        <script src="./dojo/dojo/dojo.js" data-dojo-config="isDebug:true,parseOnLoad: true">
+        </script>
+        <script>
+            // To use dojo.fx.wipeIn and dojo.fx.wipeOut, we need to require the dojo.fx module
+            dojo.require("dojo.fx");
+            dojo.require("dojox.fx");
+            dojo.require("dojox.css3.fx");
+            dojo.ready(function(){
+                var wipeOutButton = dojo.byId("wipeOutButton"), wipeInButton = dojo.byId("wipeInButton"), wipeTarget = dojo.byId("wipeTarget"), wipeToButton = dojo.byId("wipeToButton"), flipButton = dojo.byId("flipButton");
+                var longArticle = dojo.byId("longArticle");
+                
+                
+                dojo.connect(wipeOutButton, "onclick", function(evt){
+                    console.log("wipeOutButton clicked");
+                    dojox.fx.wipeOut({
+                        node: wipeTarget,/*height:0,width:0 */
+                    }).play();
+                });
+                dojo.connect(wipeInButton, "onclick", function(evt){
+                    dojo.fx.wipeIn({
+                        node: wipeTarget, /*height:100, width:100*/
+                    }).play();
+                });
+                dojo.connect(wipeToButton, "onclick", function(evt){
+                    console.log("wipeToButton clicked");
+                    dojox.fx.wipeTo({
+                        node: wipeTarget,
+                        height: 125
+                    }).play();
+                });
+                
+                dojo.connect(flipButton, "onclick", function(evt){
+                    dojox.css3.fx.flip({
+                        node: wipeTarget,
+                        whichAnim: [0],
+                    }).play();
+                });
+                
+                dojo.connect(longArticle, "onclick", function(evt){
+                    console.log("longArticle is clicked");
+					var dur = 1000; 
+                    if (longArticle.collapsed == undefined ||!longArticle.collapsed) {
+						dojox.fx.wipeIn({
+							node: longArticle,
+							height: 100,
+							duration: dur
+						}).play();
+						longArticle.collapsed=true;
+					}else{
+						dojox.fx.wipeTo({node: longArticle, height:17,duration: dur}).play();
+						longArticle.collapsed=false;
+					}
+                })
+            });
+        </script>
+    </head>
+    <body>
+        <h1>Tutorial: dojo.fx.wipeIn and dojo.fx.wipeOut</h1>
+        <button id="wipeOutButton">
+            Wipe block out
+        </button>
+        <button id="wipeToButton">
+            Wipe to 125 px in height
+        </button>
+        <button id="wipeInButton">
+            Wipe block in
+        </button>
+        <button id="flipButton">
+            Flip 
+        </button>
+        <div id="wipeTarget" class="red-block">
+            A red block
+        </div>
+        <div id="longArticle" class="section">
+            A desktop style container isn’t actually a control, but frequently required when developing enterprise software and productivity web applications. Many of the frameworks that offer this feature include built in windows management, split panels, and fluid layout.
+            Supported by: Flex, Laszlo, ExtJs, YUI, JQuery, MochaUI, Backbase, SproutCore, Silverlight
+            Send me any corrections and/or additions, and I will upload an updated control/framework matrix. 
+            Thanks to Joonas Lehtinen of IT Mill, Ryan Johnson of LivePipe, and Peter Svensson who is a Dojo expert, and Darren James, co-author of Ajax in Action. 
+            Update* Cody Lindley at jQuery provided a comprehensive list with links to code for jQuery support for all 30 controls.  
+            Comments (122) 
+        </div>
+    </body>
+</html>
