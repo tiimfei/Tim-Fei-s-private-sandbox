@@ -18,19 +18,21 @@
             dojo.require("dojo.fx");
             dojo.require("dojox.fx");
             dojo.require("dojox.css3.fx");
+			
             dojo.ready(function(){            
-                var section1 = dojo.byId("section1");
+                var section1 = dojo.byId("section1"), sectionIcon1=dojo.byId("sectionIcon1");
                 
                 dojo.connect(section1, "onclick", function(evt){
                     console.log("section1 is clicked");
                     var dur = 1000;
                     if (section1.collapsed == undefined || !section1.collapsed) {
                         dojox.fx.wipeIn({
-                            node: longArticle,
+                            node: section1,
                             height: 100,
                             duration: dur
                         }).play();
                         section1.collapsed = true;
+						sectionIcon1.src="images/collapsed.JPG";
                     }
                     else {
                         dojox.fx.wipeTo({
@@ -39,6 +41,7 @@
                             duration: dur
                         }).play();
                         section1.collapsed = false;
+						sectionIcon1.src="images/uncollapsed.JPG";
                     }
                 })
             });
@@ -46,13 +49,15 @@
     </head>
     <body>
         <h1>Tutorial: dojo.fx.wipeIn and dojox.fx.wipeTo</h1>
-        <div id="longArticle" class="section">
+        <div id="section1" class="section">
+        	<img src="images/uncollapsed.JPG" id="sectionIcon1" style="display:inline"/>
+        	<p style="display:inline;vertical-align:top;">
             A desktop style container isn’t actually a control, but frequently required when developing enterprise software and productivity web applications. Many of the frameworks that offer this feature include built in windows management, split panels, and fluid layout. 
             Supported by: Flex, Laszlo, ExtJs, YUI, JQuery, MochaUI, Backbase, SproutCore, Silverlight  
             Send me any corrections and/or additions, and I will upload an updated control/framework matrix. 
-            Thanks to Joonas Lehtinen of IT Mill, Ryan Johnson of LivePipe, and Peter Svensson who is a Dojo expert, and Darren James, co-author of Ajax in Action.  
-            Update* Cody Lindley at jQuery provided a comprehensive list with links to code for jQuery support for all 30 controls. 
-            Comments (122) 
+            
+			</p> 
         </div>
+	
     </body>
 </html>
