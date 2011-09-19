@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>MyThread</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>dojo</name>
+			<type>2</type>
+			<location>G:/javalib/dojo-release-1.6.1-src/dojo-release-1.6.1-src</location>
+		</link>
+	</linkedResources>
+</projectDescription>
