@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            
+            @import "./dojo/dijit/themes/claro/claro.css";
+        </style>
+        <script src="./dojo/dojo/dojo.js" djConfig="parseOnLoad: true">
+        </script>
+        <style type="text/css" media="screen">
+            .square {
+                width: 55px;
+                height: 55px;
+                background: #ff8040;
+                float: left;
+                -moz-border-radius: 10px;
+            }
+            
+            .person {
+                margin-left: 3px;
+                margin-top: 3px;
+            }
+            
+            .transformed0 {
+                -webkit-transform: rotate(3deg);
+                -moz-transform: rotate(3deg);
+                -ms-transform: rotate(3deg);
+                transform: rotate(3deg);
+            }
+            
+            .transformed1 {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            
+            .transformed2 {
+                -webkit-transform: rotate(357deg);
+                -moz-transform: rotate(357deg);
+                -ms-transform: rotate(357deg);
+                transform: rotate(357deg);
+            }
+        </style>
+        <script>
+            dojo.require("dojox.css3.fx");
+            dojo.require("dijit.form.ToggleButton");
+            
+            dojo.ready(function(){
+            
+                dojo.connect(Puff, "onClick", function(evt){
+                    dojox.css3.fx.puff({
+                        node: "target"
+                    }).play();
+                    
+                    
+                });
+            });
+        </script>
+    </head>
+    <body style="font-size:100%;" class="claro">
+        <div id="target" class="square">
+            <img class="person" src="http://avatar.csdn.net/2/3/6/3_tiimfei.jpg" />
+            <p>
+                Nate
+            </p>
+        </div>
+        <button dojoType="dijit.form.ToggleButton" jsId="Puff" iconClass="dijitCheckBoxIcon">
+            Wiggle
+        </button>
+    </body>
+</html>
