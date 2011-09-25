@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html dir="ltr">
+    
+    <head>
+        <style type="text/css">
+            body, html { font-family:helvetica,arial,sans-serif; font-size:90%; }
+        </style>
+        <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js"
+        djConfig="parseOnLoad: true">
+        </script>
+        <script type="text/javascript">
+            dojo.require("dijit.ProgressBar");
+            dojo.require("dojo.parser");
+
+            var i = 0;
+            function download() {
+                jsProgress.update({
+                    maximum: 10,
+                    progress: 5,
+                });
+                
+            }
+        </script>
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/claro/claro.css"
+        />
+    </head>
+    
+    <body class=" claro ">
+        <div dojoType="dijit.ProgressBar" style="width:300px" jsId="jsProgress"
+        id="downloadProgress" maximum="10">
+        </div>
+        <br />
+        <input type="button" value="Go!" onclick="download();" />
+   
+    </body>
+
+</html>
