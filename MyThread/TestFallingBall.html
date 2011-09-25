@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            
+            @import "./dojo/dijit/themes/claro/claro.css";
+        </style>
+        <script src="./dojo/dojo/dojo.js" djConfig="parseOnLoad: true">
+        </script>
+        <style type="text/css" media="screen">
+            #ball {
+                -moz-border-radius: 50px;
+                width: 100px;
+                height: 100px;
+                background-color: red;
+                margin-left: 100px;
+                margin-top: 0px
+            }
+            
+            .square {
+                width: 55px;
+                height: 55px;
+                background: #ff8040;
+                float: left;
+                -moz-border-radius: 10px;
+            }
+            
+            .person {
+                margin-left: 3px;
+                margin-top: 3px;
+            }
+            
+            .transformed0 {
+                -webkit-transform: rotate(3deg);
+                -moz-transform: rotate(3deg);
+                -ms-transform: rotate(3deg);
+                transform: rotate(3deg);
+            }
+            
+            .transformed1 {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            
+            .transformed2 {
+                -webkit-transform: rotate(357deg);
+                -moz-transform: rotate(357deg);
+                -ms-transform: rotate(357deg);
+                transform: rotate(357deg);
+            }
+        </style>
+        <script type="text/javascript">
+            dojo.require("dojo.fx.easing");
+            dojo.require("dojox.fx");
+            dojo.addOnLoad(function(){
+                
+                var jumpUpArg =	{
+                    node: "ball",
+                    properties: {
+                        marginTop: {
+                            start: 400,
+                            end: 320,
+                            unit: "px"
+                        }
+                    },
+                    easing: dojo.fx.easing.backIn,
+                    duration: 5000
+                };
+				var speedUpArg={
+					node:"ball",
+					properties:{
+						marginTop:{
+							start:320,
+							end: 0,
+							unit:"px"
+						}
+					},
+					//easing:dojo.fx.easing.backIn,
+					duration: 1000
+				} 
+                var dropDownArgs = {
+                    node: "ball",
+                    properties: {
+                        marginTop: {
+                            start: 0,
+                            end: 400,
+                            unit: "px"
+                        }
+                    },
+                    easing: dojo.fx.easing.bounceOut,
+                    duration: 5000
+                };
+				var jumpUp = dojo.animateProperty(jumpUpArg);
+				var speedUp = dojo.animateProperty(speedUpArg);
+				var dropDown =dojo.animateProperty(dropDownArgs);
+				dojo.fx.chain([jumpUp,speedUp,dropDown]).play(); 
+                
+                
+            });
+        </script>
+    </head>
+    <body style="font-size:100%;" class="claro">
+        <div id="ball">
+        </div>
+        <div id="target" class="square">
+            <img class="person" src="http://avatar.csdn.net/2/3/6/3_tiimfei.jpg" />
+            <p>
+                Nate
+            </p>
+        </div>
+        <button dojoType="dijit.form.ToggleButton" jsId="Wiggle" iconClass="dijitCheckBoxIcon">
+            Wiggle
+        </button>
+    </body>
+</html>
